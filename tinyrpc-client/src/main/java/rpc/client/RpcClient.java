@@ -1,9 +1,6 @@
-/**
- * Zentech-Inc
- * Copyright (C) 2017 All Rights Reserved.
- */
 package rpc.client;
 
+import rpc.client.connect.RpcConnect;
 import rpc.client.proxy.RpcProxy;
 
 import java.lang.reflect.Proxy;
@@ -11,10 +8,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author guangxg
- * @version $Id RpcClient.java, v 0.1 2017-09-06 19:29 guangxg Exp $$
- */
 public class RpcClient {
     private String serverAddress;
     private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16, 600L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
@@ -37,5 +30,6 @@ public class RpcClient {
 
     public static void stop() {
         threadPoolExecutor.shutdown();
+        RpcConnect.getInstance().stop();
     }
 }

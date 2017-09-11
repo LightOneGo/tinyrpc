@@ -4,11 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rpc.client.RPCFuture;
 import rpc.client.RpcClientHandler;
+import rpc.client.connect.RpcConnect;
 import rpc.common.RpcRequest;
-import rpc.common.RpcResponse;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.net.InetSocketAddress;
 import java.util.UUID;
 
 public class RpcProxy<T> implements InvocationHandler {
@@ -42,21 +43,14 @@ public class RpcProxy<T> implements InvocationHandler {
         request.setMethodName(method.getName());
         request.setParameterTypes(method.getParameterTypes());
         request.setParameters(args);
-        // Debug
-        LOGGER.info(method.getDeclaringClass().getName());
-        LOGGER.info(method.getName());
-        for (int i = 0; i < method.getParameterTypes().length; ++i) {
-            LOGGER.info(method.getParameterTypes()[i].getName());
-        }
-        for (int i = 0; i < args.length; ++i) {
-            LOGGER.info(args[i].toString());
-        }
+
         String[] array = serverAddress.split(":");
         String host = array[0];
         int port = Integer.parseInt(array[1]);
-        RpcClientHandler handler = new RpcClientHandler(host, port);
-        RpcResponse response = handler.send(request);
-        return response.getResult();
+        RpcConnect.getInstance().connect(new InetSocketAddress(host, port));
+        RpcClientHandler handler = RpcConnect.getInstance().gerRpcClientHandler();
+        RPCFuture future = handler.sendRequest(request);
+        return future.get();
     }
 
 }

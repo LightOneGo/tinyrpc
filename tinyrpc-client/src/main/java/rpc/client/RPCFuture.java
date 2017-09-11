@@ -1,7 +1,3 @@
-/**
- * Zentech-Inc
- * Copyright (C) 2017 All Rights Reserved.
- */
 package rpc.client;
 
 import org.slf4j.Logger;
@@ -15,10 +11,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
-/**
- * @author guangxg
- * @version $Id RPCFuture.java, v 0.1 2017-09-06 19:30 guangxg Exp $$
- */
 public class RPCFuture implements Future<Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RPCFuture.class);
 
