@@ -7,7 +7,7 @@ public class ClientBoot {
     public static void main(String[] args) throws InterruptedException {
         final RpcClient client = new RpcClient("127.0.0.1:8000");
         final int threadNum = 1;
-        final int requestNum = 10;
+        final int requestNum = 100000;
         long startTime = System.currentTimeMillis();
         Thread[] threads = new Thread[threadNum];
         for (int j = 0; j < threadNum; j++) {
@@ -17,7 +17,7 @@ public class ClientBoot {
                     for (int i = 0; i < requestNum; i++) {
                         final Hello syncClient = client.create(Hello.class);
                         String result = syncClient.sayHello(String.valueOf(i));
-                        System.out.println(result);
+                        //System.out.println(result);
                     }
                 }
             });
@@ -28,7 +28,7 @@ public class ClientBoot {
             threads[i].join();
         }
         long timeCost = (System.currentTimeMillis() - startTime);
-        String msg = String.format("Sync call total-time-cost:%sms, req/s=%s", timeCost, ((double) (requestNum)) / timeCost * 1000);
+        String msg = String.format("total time:%sms, req/s=%s", timeCost, ((double) (requestNum)) / timeCost * 1000);
         System.out.println(msg);
 
         client.stop();

@@ -1,42 +1,24 @@
 package rpc.client.proxy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.reflect.AbstractInvocationHandler;
 import rpc.client.RPCFuture;
 import rpc.client.RpcClientHandler;
 import rpc.client.connect.RpcConnect;
 import rpc.common.RpcRequest;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.UUID;
 
-public class RpcProxy<T> implements InvocationHandler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RpcProxy.class);
+public class ClientProxy<T> extends AbstractInvocationHandler {
+
     private String serverAddress;
 
-    public RpcProxy(String serverAddress) {
+    public ClientProxy(String serverAddress) {
         this.serverAddress = serverAddress;
     }
 
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (Object.class == method.getDeclaringClass()) {
-            String name = method.getName();
-            if ("equals".equals(name)) {
-                return proxy == args[0];
-            } else if ("hashCode".equals(name)) {
-                return System.identityHashCode(proxy);
-            } else if ("toString".equals(name)) {
-                return proxy.getClass().getName() + "@" +
-                        Integer.toHexString(System.identityHashCode(proxy)) +
-                        ", with InvocationHandler " + this;
-            } else {
-                throw new IllegalStateException(String.valueOf(method));
-            }
-        }
-
+    public Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
         RpcRequest request = new RpcRequest();
         request.setRequestId(UUID.randomUUID().toString());
         request.setClassName(method.getDeclaringClass().getName());
@@ -52,5 +34,4 @@ public class RpcProxy<T> implements InvocationHandler {
         RPCFuture future = handler.sendRequest(request);
         return future.get();
     }
-
 }

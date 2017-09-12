@@ -1,6 +1,8 @@
 package rpc.client;
 
+import com.google.common.reflect.Reflection;
 import rpc.client.connect.RpcConnect;
+import rpc.client.proxy.ClientProxy;
 import rpc.client.proxy.RpcProxy;
 
 import java.lang.reflect.Proxy;
@@ -22,6 +24,10 @@ public class RpcClient {
                 interfaceClass.getClassLoader(),
                 new Class<?>[]{interfaceClass},
                 new RpcProxy<T>(serverAddress));
+    }
+
+    public  <T> T execute(Class<T> rpcInterface) throws Exception {
+        return (T) Reflection.newProxy(rpcInterface, new ClientProxy<T>(serverAddress));
     }
 
     public static void submit(Runnable task){

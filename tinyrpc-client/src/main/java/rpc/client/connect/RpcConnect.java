@@ -13,6 +13,7 @@ import rpc.client.RpcClientHandler;
 import rpc.client.RpcClientInitializer;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -104,6 +105,36 @@ public class RpcConnect {
             throw new RuntimeException("Can't connect server!", e);
         }
         return rpcClientHandler;
+    }
+
+    public RpcClientHandler getHandler(final InetSocketAddress serverAddress) {
+        if (handler != null) {
+            return handler;
+        }
+        final CountDownLatch latch = new CountDownLatch(1);
+        Bootstrap b = new Bootstrap();
+        b.group(eventLoopGroup)
+                .channel(NioSocketChannel.class)
+                .handler(new RpcClientInitializer());
+
+        ChannelFuture channelFuture = b.connect(serverAddress);
+        channelFuture.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(final ChannelFuture channelFuture) throws Exception {
+                if (channelFuture.isSuccess()) {
+                    RpcClientHandler handler = channelFuture.channel().pipeline().get(RpcClientHandler.class);
+                    RpcConnect.getInstance().setRpcClientHandler(handler);
+                    latch.countDown();
+                }
+            }
+        });
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage());
+        }
+        return handler;
     }
 
     public void stop() {
