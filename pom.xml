@@ -12,8 +12,6 @@
         <module>tinyrpc-client</module>
         <module>tinyrpc-server</module>
         <module>tinyrpc-common</module>
-        <module>rpc-demo</module>
-        <module>tinyrpc-demo</module>
     </modules>
 
     <dependencies>

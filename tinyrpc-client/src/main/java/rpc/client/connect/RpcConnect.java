@@ -92,7 +92,7 @@ public class RpcConnect {
         this.handler = handler;
     }
 
-    public RpcClientHandler gerRpcClientHandler() throws InterruptedException {
+    public RpcClientHandler getRpcClientHandler() throws InterruptedException {
         RpcClientHandler rpcClientHandler = null;
         try {
             boolean available = waitingForHandler();
