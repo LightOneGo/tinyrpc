@@ -48,7 +48,7 @@ public class RpcProxy<T> implements InvocationHandler {
         String host = array[0];
         int port = Integer.parseInt(array[1]);
         RpcConnect.getInstance().connect(new InetSocketAddress(host, port));
-        RpcClientHandler handler = RpcConnect.getInstance().gerRpcClientHandler();
+        RpcClientHandler handler = RpcConnect.getInstance().getRpcClientHandler();
         RPCFuture future = handler.sendRequest(request);
         return future.get();
     }
