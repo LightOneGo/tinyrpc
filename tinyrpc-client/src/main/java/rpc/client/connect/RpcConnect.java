@@ -42,7 +42,7 @@ public class RpcConnect {
     }
 
     public void connect(final InetSocketAddress serverAddress) {
-
+        final CountDownLatch latch = new CountDownLatch(1);
         Bootstrap b = new Bootstrap();
         b.group(eventLoopGroup)
                 .channel(NioSocketChannel.class)
@@ -55,7 +55,7 @@ public class RpcConnect {
                 if (channelFuture.isSuccess()) {
                     RpcClientHandler handler = channelFuture.channel().pipeline().get(RpcClientHandler.class);
                     RpcConnect.getInstance().setRpcClientHandler(handler);
-                    signalAvailableHandler();
+                    latch.countDown();
                 } else {
                     EventLoop loop = (EventLoop) eventLoopGroup.schedule(new Runnable() {
                         @Override
@@ -67,6 +67,12 @@ public class RpcConnect {
                 }
             }
         });
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            LOGGER.error(e.getMessage());
+        }
 
     }
 
