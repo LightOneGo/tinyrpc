@@ -7,8 +7,12 @@
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:component-scan base-package="rpc.client"/>
+    <context:component-scan base-package="rpc.client.*"/>
 
     <context:property-placeholder location="classpath:rpc.properties"/>
+
+    <bean id="rpcServer" class="rpc.client.RpcClient">
+        <constructor-arg value="${server.address}"/>
+    </bean>
 
 </beans>
