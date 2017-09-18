@@ -26,8 +26,8 @@ public class RpcClient {
                 new RpcProxy<T>(serverAddress));
     }
 
-    public  <T> T execute(Class<T> rpcInterface) throws Exception {
-        return (T) Reflection.newProxy(rpcInterface, new ClientProxy<T>(serverAddress));
+    public  <T> T execute(Class<T> interfaceClass) {
+        return (T) Reflection.newProxy(interfaceClass, new ClientProxy<T>(serverAddress));
     }
 
     public static void submit(Runnable task){
