@@ -1,7 +1,3 @@
-/**
- * Zentech-Inc
- * Copyright (C) 2017 All Rights Reserved.
- */
 package rpc.server;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -31,10 +27,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author guangxg
- * @version $Id RpcServer.java, v 0.1 2017-09-06 19:07 guangxg Exp $$
- */
 public class RpcServer implements ApplicationContextAware, InitializingBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcServer.class);
 

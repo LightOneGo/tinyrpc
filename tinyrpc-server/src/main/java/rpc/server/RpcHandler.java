@@ -1,7 +1,3 @@
-/**
- * Zentech-Inc
- * Copyright (C) 2017 All Rights Reserved.
- */
 package rpc.server;
 
 import io.netty.channel.ChannelFuture;
@@ -17,10 +13,6 @@ import rpc.common.RpcResponse;
 
 import java.util.Map;
 
-/**
- * @author guangxg
- * @version $Id RpcHandler.java, v 0.1 2017-09-06 19:08 guangxg Exp $$
- */
 public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcHandler.class);
 

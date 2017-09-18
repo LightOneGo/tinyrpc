@@ -29,7 +29,6 @@ public class ClientProxy<T> extends AbstractInvocationHandler {
         String[] array = serverAddress.split(":");
         String host = array[0];
         int port = Integer.parseInt(array[1]);
-        //RpcConnect.getInstance().connect(new InetSocketAddress(host, port));
         RpcClientHandler handler = RpcConnect.getInstance().getHandler(new InetSocketAddress(host, port));
         RPCFuture future = handler.sendRequest(request);
         return future.get();
