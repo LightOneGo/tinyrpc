@@ -5,7 +5,7 @@ import rpc.facade.Hello;
 
 
 public class ClientBoot {
-    public static void main(String[] args) throws Exception {
+  /*  public static void main(String[] args) throws Exception {
         final RpcClient client = new RpcClient("127.0.0.1:8000");
         final int threadNum = 1;
         final int requestNum = 100000;
@@ -33,5 +33,5 @@ public class ClientBoot {
         System.out.println(msg);
 
         RpcClient.stop();
-    }
+    }*/
 }
