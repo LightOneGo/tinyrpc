@@ -50,7 +50,7 @@ public class RpcClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOGGER.error("RpcClient caught exception", cause);
+        LOGGER.error("RpcClient caught exception: connection close from " + ctx.channel().remoteAddress());
         ctx.close();
     }
 

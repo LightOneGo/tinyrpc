@@ -18,7 +18,7 @@ public class RpcConnect {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcConnect.class);
     private volatile static RpcConnect rpcConnect;
     private RpcClientHandler handler;
-    private EventLoopGroup eventLoopGroup = new NioEventLoopGroup(4);
+    private EventLoopGroup eventLoopGroup = new NioEventLoopGroup(16);
 
     private RpcConnect() {
     }

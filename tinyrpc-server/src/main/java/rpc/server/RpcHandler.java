@@ -25,10 +25,10 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
     @Override
     public void channelRead0(final ChannelHandlerContext ctx, final RpcRequest request) throws Exception {
         //多线程处理
-        RpcServer.submit(new Runnable() {
+       /* RpcServer.submit(new Runnable() {
             @Override
             public void run() {
-                //LOGGER.info("Receive request " + request.getRequestId());
+                LOGGER.info("Receive request " + request.getRequestId());
                 RpcResponse response = new RpcResponse();
                 response.setRequestId(request.getRequestId());
                 try {
@@ -36,14 +36,30 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
                     response.setResult(result);
                 } catch (Throwable t) {
                     response.setError(t.toString());
-                    //LOGGER.error("RPC Server handle request error",t);
+                    LOGGER.error("RPC Server handle request error", t);
                 }
                 ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                        //LOGGER.info("Send response for request " + request.getRequestId());
+                        LOGGER.info("Send response for request " + request.getRequestId());
                     }
                 });
+            }
+        });*/
+        //LOGGER.info("Receive request " + request.getRequestId());
+        RpcResponse response = new RpcResponse();
+        response.setRequestId(request.getRequestId());
+        try {
+            Object result = handle(request);
+            response.setResult(result);
+        } catch (Throwable t) {
+            response.setError(t.toString());
+            LOGGER.error("RPC Server handle request error", t);
+        }
+        ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                LOGGER.info("Send response for request " + request.getRequestId());
             }
         });
     }
@@ -70,7 +86,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        LOGGER.error("RPC server caught exception", cause);
+        LOGGER.error("RPC server caught exception: connection close from " + ctx.channel().remoteAddress());
         ctx.close();
     }
 }

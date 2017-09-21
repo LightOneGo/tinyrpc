@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class RpcProxy<T> implements InvocationHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcProxy.class);
@@ -48,8 +49,10 @@ public class RpcProxy<T> implements InvocationHandler {
         String host = array[0];
         int port = Integer.parseInt(array[1]);
         RpcClientHandler handler = RpcConnect.getInstance().getHandler(new InetSocketAddress(host, port));
+        LOGGER.info("send request " + request.getRequestId());
         RPCFuture future = handler.sendRequest(request);
-        return future.get();
+        //return future.get();
+        return future.get(5, TimeUnit.MILLISECONDS);
     }
 
 }
