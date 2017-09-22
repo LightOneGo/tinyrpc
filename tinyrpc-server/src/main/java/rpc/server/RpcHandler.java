@@ -24,6 +24,10 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
     @Override
     public void channelRead0(final ChannelHandlerContext ctx, final RpcRequest request) throws Exception {
+        RpcResponse response = new RpcResponse();
+        response.setRequestId(request.getRequestId());
+        BizTask task = new BizTask(request, response, handlerMap);
+        RpcServer.submit(task, ctx, request,response);
         //多线程处理
        /* RpcServer.submit(new Runnable() {
             @Override
@@ -47,7 +51,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
             }
         });*/
         //LOGGER.info("Receive request " + request.getRequestId());
-        RpcResponse response = new RpcResponse();
+        /*RpcResponse response = new RpcResponse();
         response.setRequestId(request.getRequestId());
         try {
             Object result = handle(request);
@@ -61,7 +65,7 @@ public class RpcHandler extends SimpleChannelInboundHandler<RpcRequest> {
             public void operationComplete(ChannelFuture channelFuture) throws Exception {
                 LOGGER.info("Send response for request " + request.getRequestId());
             }
-        });
+        });*/
     }
 
     private Object handle(RpcRequest request) throws Throwable {

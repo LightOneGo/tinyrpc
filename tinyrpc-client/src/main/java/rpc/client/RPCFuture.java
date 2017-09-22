@@ -70,9 +70,9 @@ public class RPCFuture implements Future<Object> {
     public void done(RpcResponse reponse) {
         this.response = reponse;
         latch.countDown();
-        long responseTime = System.currentTimeMillis() - startTime;
+       /* long responseTime = System.currentTimeMillis() - startTime;
         if (responseTime > this.responseTimeThreshold) {
             LOGGER.warn("Service response time is too slow. Request id = " + reponse.getRequestId() + ". Response Time = " + responseTime + "ms");
-        }
+        }*/
     }
 }

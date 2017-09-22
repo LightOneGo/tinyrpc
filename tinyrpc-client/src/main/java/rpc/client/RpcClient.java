@@ -6,13 +6,8 @@ import rpc.client.proxy.ClientProxy;
 import rpc.client.proxy.RpcProxy;
 
 import java.lang.reflect.Proxy;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 public class RpcClient {
     private String serverAddress;
-    private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16, 600L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
 
     public RpcClient(String serverAddress) {
         this.serverAddress = serverAddress;
@@ -30,12 +25,8 @@ public class RpcClient {
         return (T) Reflection.newProxy(interfaceClass, new ClientProxy<T>(serverAddress));
     }
 
-    public static void submit(Runnable task){
-        threadPoolExecutor.submit(task);
-    }
 
     public static void stop() {
-        threadPoolExecutor.shutdown();
         RpcConnect.getInstance().stop();
     }
 }

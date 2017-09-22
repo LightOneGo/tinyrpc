@@ -34,7 +34,6 @@ public class UserController {
     @RequestMapping("/sayhello")
     @ResponseBody
     public String sayHello(@RequestParam("name") String name) {
-        //Hello hello = rpcClient.create(Hello.class);
         return hello.sayHello(name);
     }
 }

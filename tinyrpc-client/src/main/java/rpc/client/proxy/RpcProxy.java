@@ -23,20 +23,6 @@ public class RpcProxy<T> implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (Object.class == method.getDeclaringClass()) {
-            String name = method.getName();
-            if ("equals".equals(name)) {
-                return proxy == args[0];
-            } else if ("hashCode".equals(name)) {
-                return System.identityHashCode(proxy);
-            } else if ("toString".equals(name)) {
-                return proxy.getClass().getName() + "@" +
-                        Integer.toHexString(System.identityHashCode(proxy)) +
-                        ", with InvocationHandler " + this;
-            } else {
-                throw new IllegalStateException(String.valueOf(method));
-            }
-        }
 
         RpcRequest request = new RpcRequest();
         request.setRequestId(UUID.randomUUID().toString());
@@ -49,8 +35,8 @@ public class RpcProxy<T> implements InvocationHandler {
         String host = array[0];
         int port = Integer.parseInt(array[1]);
         RpcClientHandler handler = RpcConnect.getInstance().getHandler(new InetSocketAddress(host, port));
-        LOGGER.info("send request " + request.getRequestId());
         RPCFuture future = handler.sendRequest(request);
+        LOGGER.info("send request " + request.getRequestId());
         //return future.get();
         return future.get(5, TimeUnit.MILLISECONDS);
     }

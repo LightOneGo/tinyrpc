@@ -1,8 +1,15 @@
 package rpc.server;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -25,6 +32,7 @@ import rpc.common.RpcResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +45,9 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
     private Map<String, Object> handlerMap = new HashMap<>();
 
     /* 线程池，负责执行服务调用以及结果返回 */
-    private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16, 600L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
+    //private static ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16, 600L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536));
+
+    private static volatile ListeningExecutorService listeningExecutorService;
 
     public RpcServer(String serverAddress) {
         this.serverAddress = serverAddress;
@@ -56,8 +66,8 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        EventLoopGroup bossGroup = new NioEventLoopGroup(8);
-        EventLoopGroup workerGroup = new NioEventLoopGroup(256);
+        EventLoopGroup bossGroup = new NioEventLoopGroup(2);
+        EventLoopGroup workerGroup = new NioEventLoopGroup(16);
         //ExecutionHandler executionHandler = new ExecutionHandler(new OrderedMemoryAwareThreadPoolExecutor(16, 1048576, 1048576));
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
@@ -92,11 +102,35 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
         }
     }
 
-    public static void submit(Runnable task){
+    /*public static void submit(Runnable task){
         threadPoolExecutor.submit(task);
+    }*/
+
+    public static void submit(Callable<Boolean> task, final ChannelHandlerContext ctx, final RpcRequest request, final RpcResponse response) {
+        if (listeningExecutorService == null) {
+            synchronized (RpcServer.class) {
+                if (listeningExecutorService == null) {
+                    listeningExecutorService = MoreExecutors.listeningDecorator(new ThreadPoolExecutor(16, 16, 600L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(65536)));
+                }
+            }
+        }
+
+        ListenableFuture<Boolean> listenableFuture = listeningExecutorService.submit(task);
+        Futures.addCallback(listenableFuture, new FutureCallback<Boolean>() {
+            public void onSuccess(Boolean result) {
+                ctx.writeAndFlush(response).addListener(new ChannelFutureListener() {
+                    public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                        LOGGER.info("Send response for request " + request.getRequestId());
+                    }
+                });
+            }
+            public void onFailure(Throwable t) {
+                t.printStackTrace();
+            }
+        }, listeningExecutorService);
     }
 
     public void stop() {
-        threadPoolExecutor.shutdown();
+        listeningExecutorService.shutdown();
     }
 }
